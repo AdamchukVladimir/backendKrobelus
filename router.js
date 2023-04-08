@@ -9,6 +9,7 @@ const router = new Router();
 // router.delete('/posts/:id', PostController.delete);
 
 router.post('/users' , PostController.create);
+router.post('/users/login', PostController.getAuthorization);
 router.get('/users', PostController.getAll);
 router.get('/users/:id', PostController.getOne);
 router.put('/users', PostController.update);

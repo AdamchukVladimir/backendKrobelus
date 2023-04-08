@@ -20,6 +20,17 @@ class PostService {
        }
        const post = await Post.findById(id);
        return post;
+    }
+    async getAuthorization(login, password){
+        if (!login){
+            throw new Error('Не указан Login'); 
+       }
+       if (!password){
+        throw new Error('Не указан Password'); 
+   }
+       //const post = await Post.findById(id);
+       const post = await Post.findOne({login: login, password: password })
+       return post;
     }    
     async update(post){
             if (!post._id){

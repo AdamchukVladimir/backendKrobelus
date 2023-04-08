@@ -23,6 +23,15 @@ class PostController{
         }
     }
 
+    async getAuthorization(req, res){
+        try{
+            const post = await PostService.getAuthorization(req.body.login, req.body.password);
+            return res.json(post);
+        }catch(e){
+            res.status(500).json(e.message);
+        }
+    }
+
     async getAll(req, res){
         try{
             const posts = await PostService.getAll();
