@@ -6,7 +6,7 @@ class PostService {
     async create (post, picture){
         //const fileName = fileService.saveFile(picture);
         //const createdPost = await Post.create({...post, picture: fileName});
-        const createdPost = await Post.create({login: post.login, email: post.email, password: md5(post.password)});
+        const createdPost = await Post.create({login: post.login, email: post.email, password: md5(post.password), favouriteHeroes: post.favouriteHeroes});
         return createdPost;
     }
 

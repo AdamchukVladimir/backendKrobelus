@@ -14,7 +14,7 @@ const Users = new mongoose.Schema({
     name: {type: String, default: "NoName", minlength:3, maxlength:20},
     email: {type: String, unique: true, required: true},
     password: {type: String, required: true},
-    favouriteHeroes: [String], 
+    favouriteHeroes: [{type:String}], 
     joinDate: {type: Date, default: Date.now},
     picture: {type: String}
 })
