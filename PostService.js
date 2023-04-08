@@ -1,10 +1,12 @@
 import Post from "./Post.js";
 import fileService from "./fileService.js";
+import md5 from 'md5';
 
 class PostService {
     async create (post, picture){
-        const fileName = fileService.saveFile(picture);
-        const createdPost = await Post.create({...post, picture: fileName});
+        //const fileName = fileService.saveFile(picture);
+        //const createdPost = await Post.create({...post, picture: fileName});
+        const createdPost = await Post.create({login: post.login, email: post.email, password: md5(post.password)});
         return createdPost;
     }
 
