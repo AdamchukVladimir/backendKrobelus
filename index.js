@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import multer from 'multer';
 import router from "./router.js";
 import fileUpload from 'express-fileupload';
+import cookieParser from 'cookie-parser';
 
 //STEAM
 import passport from 'passport';
@@ -20,34 +21,36 @@ var SteamStrategy = passportSteam.Strategy;
 // Required to get data from user for sessions
 passport.serializeUser((user, done) => {
     done(null, user);
-   });
-   passport.deserializeUser((user, done) => {
-    done(null, user);
-   });
-   // Initiate Strategy
-   passport.use(new SteamStrategy({
-    returnURL: 'http://localhost:' + PORT + '/api/auth/steam/return',
-    realm: 'http://localhost:' + PORT + '/',
-    apiKey: 'D1893E0A93FA327C5D749D6B9303C05E'
-    }, function (identifier, profile, done) {
-     process.nextTick(function () {
-      profile.identifier = identifier;
-      return done(null, profile);
-     });
-    }
-   ));
-   app.use(session({
-    secret: 'Whatever_You_Want',
-    saveUninitialized: true,
-    resave: false,
-    cookie: {
-     maxAge: 3600000
-    }
-   }))
-   app.use(passport.initialize());
-   app.use(passport.session());
-
-
+});
+passport.deserializeUser((user, done) => {
+done(null, user);
+});
+// Initiate Strategy
+passport.use(new SteamStrategy({
+returnURL: 'http://localhost:' + PORT + '/api/auth/steam/return',
+realm: 'http://localhost:' + PORT + '/',
+apiKey: 'D1893E0A93FA327C5D749D6B9303C05E'
+}, function (identifier, profile, done) {
+    console.log("identifier " + identifier);
+    console.log("profile " + JSON.stringify(profile));
+    console.log("done " + done);
+    process.nextTick(function () {
+    profile.identifier = identifier;
+    return done(null, profile);
+    });
+}
+));
+app.use(session({
+secret: 'Whatever_You_Want',
+saveUninitialized: true,
+resave: false,
+cookie: {
+    maxAge: 3600000
+}
+}))
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(cookieParser());
 
 // CORS middleware
 app.use(function(req, res, next) {
@@ -63,6 +66,10 @@ app.use('/api', router);
 // app.use(cors(corsOptions));//Должно вклчить корс 07.04.2023
 
 
+
+
+
+
 // Routes STEAM
 app.get('/', (req, res) => {
     console.log("req.user " + JSON.stringify(req.user));
@@ -75,6 +82,7 @@ app.get('/api/auth/steam', passport.authenticate('steam', {failureRedirect: '/'}
 app.get('/api/auth/steam/return', passport.authenticate('steam', {failureRedirect: '/'}), function (req, res) {
     //res.redirect('/')
     console.log("req.user " + JSON.stringify(req.user));
+    res.cookie('sessionIDsteam', req.sessionID,{httpOnly: true});
     res.redirect('http://localhost:8080');
 });
 
