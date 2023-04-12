@@ -4,16 +4,28 @@ import multer from 'multer';
 import router from "./router.js";
 import fileUpload from 'express-fileupload';
 import cookieParser from 'cookie-parser';
+import jwt from  'jsonwebtoken';
+import secret from "./config.js";
 
 //STEAM
 import passport from 'passport';
 import session from 'express-session';
 import passportSteam from 'passport-steam';
+const generateAccessToken = (steamid, favHeroes)=>{
+    const payload = {
+        steamid,
+        favHeroes,
+    }    
+    return jwt.sign(payload, secret, {expiresIn: "24h"})
+}
 
 const PORT = 5000;
 const PORT_8080 = 8080;
 const DB_URL = `mongodb+srv://1virusafw1:Storm228322S@cluster1.wxnlurr.mongodb.net/?retryWrites=true&w=majority`;
 const app = express();
+
+
+
 
 //STEAM
 var SteamStrategy = passportSteam.Strategy;
@@ -34,6 +46,7 @@ apiKey: 'D1893E0A93FA327C5D749D6B9303C05E'
     console.log("identifier " + identifier);
     console.log("profile " + JSON.stringify(profile));
     console.log("done " + done);
+
     process.nextTick(function () {
     profile.identifier = identifier;
     return done(null, profile);
@@ -81,7 +94,11 @@ app.get('/api/auth/steam', passport.authenticate('steam', {failureRedirect: '/'}
 });
 app.get('/api/auth/steam/return', passport.authenticate('steam', {failureRedirect: '/'}), function (req, res) {
     //res.redirect('/')
-    console.log("req.user " + JSON.stringify(req.user));
+    //console.log("req.user " + JSON.stringify(req.user));
+    //console.log("req.body.token " + req.body.token);
+    //console.log("req.user.steamid " + req.user._json.steamid);
+    const token = generateAccessToken(req.user._json.steamid, [1,2]);
+    res.cookie('tokenSteam', token,{httpOnly: false});
     res.cookie('sessionIDsteam', req.sessionID,{httpOnly: true});
     res.redirect('http://localhost:8080');
 });
