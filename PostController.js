@@ -65,6 +65,17 @@ class PostController{
         }
         
     }
+    // async steamUser(req, res){
+    //     app.post('/api/steam/user', (req, res) => {
+    //         console.log("req.body " + JSON.stringify(req.body));
+    //         console.log("req.body.token " + req.body.token);
+    //         axios.get(`https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=D1893E0A93FA327C5D749D6B9303C05E&steamids=${req.body.token}`)
+    //           .then((response) => {
+    //             // Отправляйте ответ на клиент, содержащий информацию о пользователе
+    //             res.send({ user: response.data.response.players[0] });
+    //         });
+    //     });
+    // }
 }
 
 export default new PostController();
