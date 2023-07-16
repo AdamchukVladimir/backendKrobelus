@@ -7,6 +7,9 @@ import cookieParser from 'cookie-parser';
 import jwt from  'jsonwebtoken';
 import secret from "./config.js";
 import axios from 'axios';
+import WebSocket from 'ws';
+
+import findMatchingImages from "./draftOCR.js";//Импорт поиска героев OCR
 
 //STEAM
 import passport from 'passport';
@@ -21,9 +24,11 @@ const generateAccessToken = (steamid, favHeroes)=>{
 }
 
 const PORT = 5000;
-const PORT_8080 = 8080;
+const PORT_5050 = 5050;
 const DB_URL = `mongodb+srv://1virusafw1:Storm228322S@cluster1.wxnlurr.mongodb.net/?retryWrites=true&w=majority`;
 const app = express();
+
+
 
 
 
@@ -77,7 +82,25 @@ app.use(express.json());
 app.use(express.static('static'));
 app.use(fileUpload({}));
 app.use('/api', router);
-// app.use(cors(corsOptions));//Должно вклчить корс 07.04.2023
+//app.use(cors(corsOptions));//Должно вклчить корс 07.04.2023
+
+//OCR draft подборка персонажей в онлайн режиме
+app.get('/api/ocr/draft', (req, res) => {
+    console.log("api/ocr/draft ");
+    console.log("api/ocr/draft req " + req);
+    
+    findMatchingImages()
+    .then((imageId) => {
+      console.log("185 imageId " + imageId);
+      //res.json({ imageId });
+      res.send("OCR id " + imageId);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ error: 'An error occurred' });
+    });
+
+})
 
 app.post('/api/steam/user', (req, res) => {
     console.log("req.body " + JSON.stringify(req.body));
@@ -115,9 +138,9 @@ app.get('/api/auth/steam/return', passport.authenticate('steam', {failureRedirec
 
 
 app.get('/', (req, res) => {
-    res.status(200).json('Сервер работает');    
+    res.status(200).json('Сервер работает');   
+    res.send('Сервер работает');
 })
-
 
 
 async function startApp(){
