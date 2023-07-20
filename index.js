@@ -127,7 +127,7 @@ app.post('/api/ocr/draft', (req, res) => {
 //end OCR darft
 
 //GSI dota get team_name
-app.post('/api/gsi/side', (req, res) => {
+app.get('/api/gsi/side', (req, res) => {
     console.log("/api/gsi/side");
     try{
         console.log("res team_name " + team_name);
