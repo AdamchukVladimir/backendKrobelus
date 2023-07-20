@@ -11,6 +11,28 @@ import WebSocket from 'ws';
 
 import findMatchingImages from "./draftOCR.js";//Импорт поиска героев OCR
 
+//dota GSI автоматизация получения стороны radiant/dire
+import d2gsi from 'dota2-gsi';
+const server = new d2gsi();
+let team_name = "";
+server.events.on('newclient', function(client) {
+    console.log("New client connection, IP address: " + client.ip);
+    if (client.auth && client.auth.token) {
+        console.log("Auth token: " + client.auth.token);
+    } else {
+        console.log("No Auth token");
+    }
+    client.on('newdata', function(newdata) {
+        if (newdata) console.log("newdata! " + JSON.stringify(newdata));
+        if (newdata){
+             console.log("newdata! team_name " + JSON.stringify(newdata.player.team_name));
+             team_name = newdata.player.team_name;
+        }     
+    });
+});
+//END dota GSI
+
+
 //STEAM
 import passport from 'passport';
 import session from 'express-session';
@@ -85,22 +107,40 @@ app.use('/api', router);
 //app.use(cors(corsOptions));//Должно вклчить корс 07.04.2023
 
 //OCR draft подборка персонажей в онлайн режиме
-app.get('/api/ocr/draft', (req, res) => {
+app.post('/api/ocr/draft', (req, res) => {
     console.log("api/ocr/draft ");
-    console.log("api/ocr/draft req " + req);
+    console.log("api/ocr/draft req " + req.body.heroNumber);
     
-    findMatchingImages()
+    //findMatchingImages(heroNumber)
+    findMatchingImages(req.body.heroNumber)
     .then((imageId) => {
       console.log("185 imageId " + imageId);
       //res.json({ imageId });
-      res.send("OCR id " + imageId);
+      res.send(imageId);
     })
     .catch((error) => {
       console.error(error);
-      res.status(500).json({ error: 'An error occurred' });
+      res.status(500).json({ error: 'An error occurred OCR' });
     });
 
-})
+});
+//end OCR darft
+
+//GSI dota get team_name
+app.post('/api/gsi/side', (req, res) => {
+    console.log("/api/gsi/side");
+    try{
+        console.log("res team_name " + team_name);
+        res.send(team_name);
+    }
+    catch(error) {
+        console.log("Error GSI dota res");
+        console.error(error);
+    }    
+
+});
+//END GSI dota 
+
 
 app.post('/api/steam/user', (req, res) => {
     console.log("req.body " + JSON.stringify(req.body));
